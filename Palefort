@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palefort — Compra-venta de palets en Tarragona</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B1815;
+    --paper:#F2EADD;
+    --paper-2:#E8DDC8;
+    --walnut:#5C3A22;
+    --walnut-dk:#3D2615;
+    --stamp:#C75D2C;
+    --steel:#41566B;
+    --gold:#C9A24B;
+    --line: rgba(27,24,21,0.16);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    font-size:17px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.disp{
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+    color:var(--walnut-dk);
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
+  ::selection{background:var(--stamp); color:var(--paper);}
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{
+    outline:3px solid var(--stamp);
+    outline-offset:3px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  /* ---------- STAMP component (signature element) ---------- */
+  .stamp{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    width:108px; height:108px;
+    border:2.5px solid currentColor;
+    border-radius:50%;
+    position:relative;
+    text-align:center;
+    flex-shrink:0;
+  }
+  .stamp::before{
+    content:"";
+    position:absolute;
+    inset:7px;
+    border:1px solid currentColor;
+    border-radius:50%;
+    opacity:0.55;
+  }
+  .stamp .stamp-num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:1.5rem;
+    font-weight:600;
+    line-height:1;
+  }
+  .stamp .stamp-label{
+    font-family:'Oswald', sans-serif;
+    font-size:0.56rem;
+    letter-spacing:0.09em;
+    text-transform:uppercase;
+    margin-top:3px;
+    padding:0 6px;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(242,234,221,0.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    height:78px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:1.35rem;
+    letter-spacing:0.04em;
+    color:var(--walnut-dk);
+  }
+  .brand img{height:38px; width:auto; border-radius:4px;}
+  .navlinks{display:flex; gap:34px; align-items:center;}
+  .navlinks a{
+    font-size:0.92rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--ink);
+    position:relative;
+    padding:6px 0;
+  }
+  .navlinks a::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0;
+    height:2px; background:var(--stamp);
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .25s ease;
+  }
+  .navlinks a:hover::after{transform:scaleX(1);}
+  .phone-btn{
+    background:var(--stamp); color:var(--paper);
+    padding:10px 18px; border-radius:3px;
+    font-weight:700; font-size:0.92rem;
+    letter-spacing:0.02em;
+    white-space:nowrap;
+  }
+  .burger{display:none; background:none; border:none; cursor:pointer; padding:8px;}
+  .burger span{display:block; width:24px; height:2px; background:var(--ink); margin:5px 0;}
+  .mobile-menu{display:none; flex-direction:column; gap:0; border-top:1px solid var(--line);}
+  .mobile-menu a{padding:16px 28px; border-bottom:1px solid var(--line); font-weight:600; text-transform:uppercase; font-size:0.9rem; letter-spacing:0.04em;}
+  .mobile-menu.open{display:flex;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:88vh;
+    display:flex; align-items:flex-end;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .hero img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    z-index:-2;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(27,24,21,0.35) 0%, rgba(27,24,21,0.55) 55%, rgba(27,24,21,0.92) 100%);
+    z-index:-1;
+  }
+  .hero-inner{
+    width:100%;
+    padding:60px 0 64px;
+    color:var(--paper);
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.82rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{content:""; width:30px; height:1px; background:var(--gold);}
+  .hero h1{
+    font-size:clamp(2.6rem, 6vw, 5rem);
+    line-height:0.98;
+    color:var(--paper);
+    max-width:14ch;
+    margin-bottom:22px;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--stamp);
+  }
+  .hero p{
+    max-width:46ch;
+    font-size:1.1rem;
+    color:rgba(242,234,221,0.85);
+    margin-bottom:34px;
+  }
+  .cta-row{display:flex; gap:16px; flex-wrap:wrap;}
+  .btn{
+    display:inline-block;
+    padding:15px 28px;
+    border-radius:3px;
+    font-weight:700;
+    font-size:0.95rem;
+    letter-spacing:0.02em;
+    border:1.5px solid transparent;
+  }
+  .btn-primary{background:var(--stamp); color:var(--paper);}
+  .btn-ghost{border-color:rgba(242,234,221,0.55); color:var(--paper);}
+
+  /* ---------- SECTION generic ---------- */
+  section{padding:96px 0;}
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:30px; margin-bottom:54px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    padding-bottom:26px;
+  }
+  .section-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.8rem; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--steel); margin-bottom:10px; display:block;
+  }
+  .section-head h2{font-size:clamp(1.8rem, 3.4vw, 2.6rem); max-width:16ch;}
+  .section-head p{max-width:38ch; color:#48433d; font-size:1rem;}
+
+  /* ---------- TRUST STRIP ---------- */
+  .trust{
+    background:var(--walnut-dk);
+    color:var(--paper);
+    padding:54px 0;
+  }
+  .trust .wrap{
+    display:flex; gap:50px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+  }
+  .trust-item{display:flex; gap:16px; align-items:center; color:var(--paper);}
+  .trust .stamp{color:var(--gold); width:78px; height:78px;}
+  .trust-item .stamp-num{font-size:1.05rem;}
+  .trust-item .t-label{
+    font-size:0.95rem; color:rgba(242,234,221,0.82); max-width:18ch;
+  }
+
+  /* ---------- SERVICIOS ---------- */
+  .services-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .service-card{
+    background:var(--paper);
+    padding:40px 32px;
+    transition:background .2s ease;
+  }
+  .service-card:hover{background:var(--paper-2);}
+  .service-card .mono{
+    color:var(--stamp); font-size:0.85rem; display:block; margin-bottom:18px;
+  }
+  .service-card h3{font-size:1.25rem; margin-bottom:14px; color:var(--walnut-dk);}
+  .service-card p{color:#4a443d; font-size:0.97rem;}
+
+  /* ---------- TIPOS DE PALET ---------- */
+  .types{background:var(--walnut-dk); color:var(--paper);}
+  .types .section-tag{color:var(--gold);}
+  .types .section-head{border-color:rgba(242,234,221,0.18);}
+  .types .section-head h2{color:var(--paper);}
+  .types .section-head p{color:rgba(242,234,221,0.7);}
+  .types-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:18px;
+  }
+  .type-card{
+    border:1px solid rgba(242,234,221,0.22);
+    padding:28px 22px;
+    position:relative;
+  }
+  .type-card .stamp{
+    width:54px; height:54px; color:var(--gold); position:absolute; top:-27px; right:20px;
+    background:var(--walnut-dk);
+  }
+  .type-card h3{color:var(--paper); font-size:1.05rem; margin-bottom:10px; margin-top:8px;}
+  .type-card .dims{
+    color:var(--gold); font-size:0.85rem; display:block; margin-bottom:12px;
+  }
+  .type-card p{color:rgba(242,234,221,0.72); font-size:0.92rem;}
+
+  /* ---------- POR QUE ---------- */
+  .why-grid{
+    display:grid; grid-template-columns:1.1fr 1fr; gap:64px; align-items:start;
+  }
+  .why-list{display:flex; flex-direction:column; gap:0;}
+  .why-item{
+    display:flex; gap:22px; padding:26px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .why-item:first-child{padding-top:0;}
+  .why-item .stamp{
+    width:64px; height:64px; color:var(--stamp); flex-shrink:0;
+  }
+  .why-item h3{font-size:1.1rem; margin-bottom:6px; color:var(--walnut-dk);}
+  .why-item p{color:#4a443d; font-size:0.95rem;}
+  .why-photo{
+    border-radius:4px; overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .why-photo img{width:100%; height:520px; object-fit:cover;}
+
+  /* ---------- PROCESO ---------- */
+  .process{background:var(--paper-2);}
+  .process-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative;
+  }
+  .process-grid::before{
+    content:"";
+    position:absolute; top:34px; left:5%; right:5%; height:2px;
+    background:repeating-linear-gradient(90deg, var(--walnut) 0 10px, transparent 10px 20px);
+    z-index:0;
+  }
+  .process-step{position:relative; z-index:1; padding:0 18px;}
+  .process-step .num{
+    width:68px; height:68px; border-radius:50%;
+    background:var(--paper-2); border:2.5px solid var(--walnut);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace; font-weight:600; font-size:1.3rem;
+    color:var(--walnut-dk);
+    margin-bottom:22px;
+  }
+  .process-step h3{font-size:1.05rem; margin-bottom:8px;}
+  .process-step p{font-size:0.92rem; color:#4a443d;}
+
+  /* ---------- CONTACTO ---------- */
+  .contact{
+    background:var(--ink); color:var(--paper);
+  }
+  .contact .section-tag{color:var(--gold);}
+  .contact .section-head{border-color:rgba(242,234,221,0.18);}
+  .contact .section-head h2{color:var(--paper);}
+  .contact .section-head p{color:rgba(242,234,221,0.65);}
+  .contact-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:64px;
+  }
+  .contact-info{display:flex; flex-direction:column; gap:28px;}
+  .info-row{display:flex; gap:18px;}
+  .info-row .mono{
+    color:var(--gold); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; min-width:90px; padding-top:2px;
+  }
+  .info-row div p{color:rgba(242,234,221,0.85); font-size:1rem;}
+  .info-row div a{color:var(--paper); font-weight:600; border-bottom:1px solid var(--stamp);}
+  .map-box{
+    margin-top:10px; border:1px solid rgba(242,234,221,0.2);
+    height:180px; display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace; font-size:0.8rem; color:rgba(242,234,221,0.45);
+    letter-spacing:0.06em; text-transform:uppercase;
+  }
+  form{display:flex; flex-direction:column; gap:18px;}
+  .field{display:flex; flex-direction:column; gap:8px;}
+  .field label{
+    font-family:'JetBrains Mono', monospace; font-size:0.78rem;
+    text-transform:uppercase; letter-spacing:0.08em; color:rgba(242,234,221,0.6);
+  }
+  .field input, .field select, .field textarea{
+    background:transparent;
+    border:none; border-bottom:1px solid rgba(242,234,221,0.35);
+    color:var(--paper);
+    padding:10px 2px;
+    font-family:'Source Sans 3', sans-serif;
+    font-size:1rem;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none; border-color:var(--stamp);
+  }
+  .field textarea{resize:vertical; min-height:80px;}
+  .field select option{color:var(--ink);}
+  .submit-btn{
+    margin-top:8px;
+    background:var(--stamp); color:var(--paper);
+    border:none; padding:16px 26px; border-radius:3px;
+    font-weight:700; font-size:0.95rem; letter-spacing:0.02em;
+    cursor:pointer; align-self:flex-start;
+  }
+  .form-note{font-size:0.8rem; color:rgba(242,234,221,0.45); margin-top:6px;}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    background:var(--walnut-dk); color:rgba(242,234,221,0.6);
+    padding:36px 0; font-size:0.85rem;
+  }
+  footer .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;}
+  footer a{color:rgba(242,234,221,0.8);}
+  .foot-links{display:flex; gap:24px;}
+
+  /* ---------- reveal animation ---------- */
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:980px){
+    .why-grid{grid-template-columns:1fr;}
+    .why-photo img{height:340px;}
+    .contact-grid{grid-template-columns:1fr;}
+    .types-grid{grid-template-columns:repeat(2,1fr);}
+    .services-grid{grid-template-columns:1fr;}
+    .process-grid{grid-template-columns:1fr 1fr; gap:40px 0;}
+    .process-grid::before{display:none;}
+  }
+  @media (max-width:720px){
+    .navlinks{display:none;}
+    .burger{display:block;}
+    .trust .wrap{justify-content:center; text-align:center;}
+    .trust-item{flex-direction:column;}
+    .types-grid{grid-template-columns:1fr;}
+    .process-grid{grid-template-columns:1fr;}
+    .hero h1{max-width:none;}
+    section{padding:64px 0;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav wrap">
+    <a href="#top" class="brand">
+      <img src="https://palefort.com/wp-content/uploads/2025/06/cropped-palefortLogo.jpg" alt="Palefort">
+      PALEFORT
+    </a>
+    <div class="navlinks">
+      <a href="#servicios">Servicios</a>
+      <a href="#tipos">Tipos de palet</a>
+      <a href="#porque">Por qué Palefort</a>
+      <a href="#proceso">Proceso</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <a href="tel:+34977877345" class="phone-btn navlinks">977 87 73 45</a>
+    <button class="burger" aria-label="Abrir menú" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="mobile-menu">
+    <a href="#servicios">Servicios</a>
+    <a href="#tipos">Tipos de palet</a>
+    <a href="#porque">Por qué Palefort</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#contacto">Contacto</a>
+    <a href="tel:+34977877345">Llamar: 977 87 73 45</a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <img src="https://palefort.com/wp-content/uploads/2025/10/DSC_0457-1-1024x683.jpg" alt="Almacén de palets Palefort">
+  <div class="hero-inner wrap">
+    <span class="eyebrow">Perafort · Tarragona</span>
+    <h1>Compra y venta de <em>palets</em>, sin complicaciones</h1>
+    <p>Recogemos, valoramos y pagamos tus palets usados. Te suministramos palets nuevos, reacondicionados o a medida, listos para tu cadena logística.</p>
+    <div class="cta-row">
+      <a href="tel:+34977877345" class="btn btn-primary">Llamar ahora · 977 87 73 45</a>
+      <a href="#contacto" class="btn btn-ghost">Pedir presupuesto</a>
+    </div>
+  </div>
+</section>
+
+<div class="trust">
+  <div class="wrap">
+    <div class="trust-item">
+      <div class="stamp"><span class="stamp-num">N240</span><span class="stamp-label">Acceso directo</span></div>
+      <div class="t-label">A pie de la Crta. N-240, Km 7,2 — entrada y salida de camiones sin rodeos</div>
+    </div>
+    <div class="trust-item">
+      <div class="stamp"><span class="stamp-num">EUR</span><span class="stamp-label">EPAL</span></div>
+      <div class="t-label">Palet europeo, americano, de madera y plástico — nuevo, usado o reacondicionado</div>
+    </div>
+    <div class="trust-item">
+      <div class="stamp"><span class="stamp-num">24h</span><span class="stamp-label">Respuesta</span></div>
+      <div class="t-label">Valoración y recogida ágil en empresas de todo el Camp de Tarragona</div>
+    </div>
+  </div>
+</div>
+
+<section id="servicios">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-tag">Servicios</span>
+        <h2>Compramos, vendemos y movemos tus palets</h2>
+      </div>
+      <p>Un único interlocutor para todo el ciclo del palet: entra, se valora, se recoge o se entrega.</p>
+    </div>
+    <div class="services-grid reveal">
+      <div class="service-card">
+        <span class="mono">01</span>
+        <h3>Compra de palets usados</h3>
+        <p>Te compramos los palets que ya no usas. Valoramos según estado y volumen, y organizamos la recogida en tu propia empresa.</p>
+      </div>
+      <div class="service-card">
+        <span class="mono">02</span>
+        <h3>Venta y suministro</h3>
+        <p>Palets nuevos, reacondicionados o de segunda mano, en la cantidad y plazo que necesite tu operación logística.</p>
+      </div>
+      <div class="service-card">
+        <span class="mono">03</span>
+        <h3>Recogida y transporte</h3>
+        <p>Nos encargamos del transporte de carga y descarga, con vehículos propios adaptados a entregas de pallets en lote.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="types" id="tipos">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-tag">Catálogo</span>
+        <h2>Un palet para cada carga</h2>
+      </div>
+      <p>Trabajamos los formatos más usados en la industria y la logística del Camp de Tarragona.</p>
+    </div>
+    <div class="types-grid reveal">
+      <div class="type-card">
+        <div class="stamp"><span class="stamp-num">EUR</span></div>
+        <h3>Europeo / EPAL</h3>
+        <span class="dims mono">800 × 1200 mm</span>
+        <p>El estándar europeo. Madera certificada, ideal para intercambio y circuitos cerrados.</p>
+      </div>
+      <div class="type-card">
+        <div class="stamp"><span class="stamp-num">US</span></div>
+        <h3>Americano</h3>
+        <span class="dims mono">1000 × 1200 mm</span>
+        <p>Mayor superficie de carga, habitual en exportación y contenedores marítimos.</p>
+      </div>
+      <div class="type-card">
+        <div class="stamp"><span class="stamp-num">MD</span></div>
+        <h3>Madera estándar</h3>
+        <span class="dims mono">A medida</span>
+        <p>Nuevo, usado o reacondicionado. Tratamiento NIMF-15 disponible para exportación.</p>
+      </div>
+      <div class="type-card">
+        <div class="stamp"><span class="stamp-num">PL</span></div>
+        <h3>Plástico</h3>
+        <span class="dims mono">Higiénico</span>
+        <p>Resistente a la humedad y de larga vida útil, para sectores con requisitos de higiene.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="porque">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-tag">Por qué Palefort</span>
+        <h2>Cercanía, rapidez y buen precio</h2>
+      </div>
+    </div>
+    <div class="why-grid">
+      <div class="why-list reveal">
+        <div class="why-item">
+          <div class="stamp"><span class="stamp-num">€</span></div>
+          <div>
+            <h3>Precio justo, sin sorpresas</h3>
+            <p>Valoramos cada lote con criterios claros y te damos el precio antes de mover un solo palet.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="stamp"><span class="stamp-num">♻</span></div>
+          <div>
+            <h3>Economía circular</h3>
+            <p>Cada palet reutilizado es uno menos que va a contenedor. Damos una segunda vida a madera en buen estado.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="stamp"><span class="stamp-num">📍</span></div>
+          <div>
+            <h3>Ubicación estratégica</h3>
+            <p>En Perafort, junto a la N-240 y a minutos de la AP-7 y el polígono químico de Tarragona.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="stamp"><span class="stamp-num">⚒</span></div>
+          <div>
+            <h3>Trato directo</h3>
+            <p>Hablas con quien decide. Sin departamentos intermedios ni esperas para una respuesta.</p>
+          </div>
+        </div>
+      </div>
+      <div class="why-photo reveal">
+        <img src="https://palefort.com/wp-content/uploads/2025/10/DSC_0457-1-1024x683.jpg" alt="Patio de Palefort">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="process" id="proceso">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-tag">Cómo funciona</span>
+        <h2>De la llamada a la recogida</h2>
+      </div>
+      <p>Cuatro pasos, sin papeleo innecesario.</p>
+    </div>
+    <div class="process-grid reveal">
+      <div class="process-step">
+        <div class="num">1</div>
+        <h3>Nos cuentas qué tienes</h3>
+        <p>Tipo de palet, cantidad y estado, por teléfono o por el formulario de contacto.</p>
+      </div>
+      <div class="process-step">
+        <div class="num">2</div>
+        <h3>Te damos un precio</h3>
+        <p>Valoración clara en el mismo día, sin compromiso.</p>
+      </div>
+      <div class="process-step">
+        <div class="num">3</div>
+        <h3>Recogemos o entregamos</h3>
+        <p>Coordinamos día y hora con transporte propio.</p>
+      </div>
+      <div class="process-step">
+        <div class="num">4</div>
+        <h3>Cerramos la operación</h3>
+        <p>Pago acordado y, si lo necesitas, hoja de seguimiento.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contacto">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-tag">Contacto</span>
+        <h2>Hablemos de tus palets</h2>
+      </div>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <div class="info-row">
+          <span class="mono">Teléfono</span>
+          <div><p><a href="tel:+34977877345">977 87 73 45</a></p></div>
+        </div>
+        <div class="info-row">
+          <span class="mono">Dirección</span>
+          <div><p>Crta. N-240, Km. 7,2<br>Perafort (Tarragona)</p></div>
+        </div>
+        <div class="info-row">
+          <span class="mono">Horario</span>
+          <div><p>Lunes a viernes, 8:00 – 17:00h</p></div>
+        </div>
+        <div class="map-box">[ mapa de ubicación — Crta. N-240, Km 7,2, Perafort ]</div>
+      </div>
+      <form onsubmit="event.preventDefault(); this.querySelector('.submit-btn').textContent='Enviado ✓';">
+        <div class="field">
+          <label for="nombre">Nombre y empresa</label>
+          <input id="nombre" type="text" placeholder="Tu nombre" required>
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" type="tel" placeholder="600 000 000" required>
+        </div>
+        <div class="field">
+          <label for="tipo">Quiero</label>
+          <select id="tipo">
+            <option>Vender palets</option>
+            <option>Comprar palets</option>
+            <option>Consultar precios</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="msg">Detalle</label>
+          <textarea id="msg" placeholder="Tipo y cantidad de palets"></textarea>
+        </div>
+        <button class="submit-btn" type="submit">Enviar solicitud</button>
+        <span class="form-note">Maqueta de demostración — el formulario no envía datos reales.</span>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Palefort SL — Crta. N-240, Km. 7,2, Perafort (Tarragona)</span>
+    <div class="foot-links">
+      <a href="#">Política de privacidad</a>
+      <a href="#">Aviso legal</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:0.12});
+  reveals.forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>
